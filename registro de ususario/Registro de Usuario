@@ -1,0 +1,138 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class RegistroUsuarios extends JFrame implements ActionListener {
+
+    private JLabel lblNombre, lblEmail, lblContraseña, lblTelefono;
+    private JTextField txtNombre, txtEmail, txtTelefono;
+    private JPasswordField txtContraseña;
+    private JButton btnRegistrar, btnViewProducts, btnRegisterProducts;
+
+    public RegistroUsuarios() {
+        setTitle("Registro de Usuarios");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel(new GridBagLayout());
+
+        lblNombre = new JLabel("Nombre:");
+        lblEmail = new JLabel("Email:");
+        lblContraseña = new JLabel("Contraseña:");
+        lblTelefono = new JLabel("Teléfono:");
+        txtNombre = new JTextField(20);
+        txtEmail = new JTextField(20);
+        txtContraseña = new JPasswordField(20);
+        txtTelefono = new JTextField(20);
+        btnRegistrar = new JButton("Registrar");
+        btnViewProducts = new JButton("View Products");
+        btnRegisterProducts = new JButton("Register Products");
+
+        btnRegistrar.addActionListener(this);
+        btnViewProducts.addActionListener(this);
+        btnRegisterProducts.addActionListener(this);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(lblNombre, gbc);
+
+        gbc.gridx = 1;
+        panel.add(txtNombre, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(lblEmail, gbc);
+
+        gbc.gridx = 1;
+        panel.add(txtEmail, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        panel.add(lblContraseña, gbc);
+
+        gbc.gridx = 1;
+        panel.add(txtContraseña, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        panel.add(lblTelefono, gbc);
+
+        gbc.gridx = 1;
+        panel.add(txtTelefono, gbc);
+
+        Container contenedor = getContentPane();
+        contenedor.setLayout(new BorderLayout());
+        contenedor.add(panel, BorderLayout.CENTER);
+        contenedor.add(btnRegistrar, BorderLayout.SOUTH);
+        contenedor.add(btnViewProducts, BorderLayout.NORTH);
+        contenedor.add(btnRegisterProducts, BorderLayout.EAST);
+
+        setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == btnRegistrar) {
+            registrarUsuario();
+        } else if (e.getSource() == btnViewProducts) {
+            // Lógica para mostrar productos
+            JOptionPane.showMessageDialog(this, "Mostrar productos");
+        } else if (e.getSource() == btnRegisterProducts) {
+            // Lógica para registrar productos
+            JOptionPane.showMessageDialog(this, "Registrar productos");
+        }
+    }
+
+    private void registrarUsuario() {
+        String nombre = txtNombre.getText();
+        String email = txtEmail.getText();
+        char[] contraseña = txtContraseña.getPassword();
+        String telefono = txtTelefono.getText();
+
+        if (nombre.isEmpty() || email.isEmpty() || contraseña.length == 0 || telefono.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingrese todos los datos", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            if (isValidEmail(email)) {
+                // Guardar detalles del usuario en el archivo
+                guardarUsuarioEnArchivo(nombre, email, new String(contraseña), telefono);
+
+                JOptionPane.showMessageDialog(this, "Usuario registrado con éxito", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                limpiarCampos();
+            } else {
+                JOptionPane.showMessageDialog(this, "Formato de correo electrónico no válido", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private boolean isValidEmail(String email) {
+        return email.matches("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
+    }
+
+    private void limpiarCampos() {
+        txtNombre.setText("");
+        txtEmail.setText("");
+        txtContraseña.setText("");
+        txtTelefono.setText("");
+    }
+
+    private void guardarUsuarioEnArchivo(String nombre, String email, String contraseña, String telefono) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("data/usuarios.txt", true))) {
+            writer.write(nombre + "," + email + "," + contraseña + "," + telefono);
+            writer.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al guardar en el archivo", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public static void main(String[] args) {
+        new RegistroUsuarios();
+    }
+}
